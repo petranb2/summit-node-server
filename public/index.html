@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Tailwind Starter Template - Fixed Header : Tailwind Toolbox</title>
+    <meta name="author" content="name" />
+    <meta name="description" content="description here" />
+    <meta name="keywords" content="keywords,here" />
+    <link href="stylesheets/tailwind.min.css" rel="stylesheet" />
+    <script src="javascripts/summit.js"></script>
+  </head>
+  <body class="bg-gray-400 font-sans leading-normal tracking-normal">
+    <component html="components/nav.html"></component>
+    <!--Container-->
+    <div class="container shadow-lg mx-auto bg-white mt-24 md:mt-16 h-screen">
+      <component id="main" html="components/home.html" js='components/home.js'></component>
+    </div>
+  </body>
+</html>
