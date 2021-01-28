@@ -84,6 +84,7 @@ async function fetchComponents() {
  */
 async function renderComponent(node, component, initialRender = true) {
   //render component to node
+
   node.innerHTML = component;
   node.removeAttribute("html");
 
@@ -99,8 +100,9 @@ async function renderComponent(node, component, initialRender = true) {
     comp.fetch();
     comp.render();
     let user = new comp.Component();
-    user.render();
-    node.innerHTML = "js loaded";
+    let data = user.fetchData();
+    let compiledComponent = renderData(component, data);
+    node.innerHTML = compiledComponent;
   }
   let cssFile = node.getAttribute("css");
   // load css file
@@ -118,3 +120,9 @@ function summitRouter(path, replaceId) {
   var popStateEvent = new PopStateEvent("popstate", { state: replaceId });
   dispatchEvent(popStateEvent);
 }
+
+const renderData = (template, data) => {
+  return template.replace(/{{(.*?)}}/g, (match) => {
+    return data[match.split(/{{|}}/).filter(Boolean)[0].split('.')[0]][match.split(/{{|}}/).filter(Boolean)[0].split('.')[1]];
+  });
+};

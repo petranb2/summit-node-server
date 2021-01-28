@@ -11,4 +11,13 @@ export class Component {
   render() {
     console.log("render user");
   }
+  fetchData() {
+    console.log("render user");
+    return {
+      name: "petros",
+      user: {
+        name: "petros",
+      },
+    };
+  }
 }
