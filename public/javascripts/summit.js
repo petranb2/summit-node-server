@@ -51,16 +51,18 @@ async function fetchComponents() {
     let componentKey = node.getAttribute("html");
     if (componentKey) {
       if (CACHE_COMPONENTS.get(componentKey)) {
-        renderComponent(
+        console.time(componentKey);
+        await renderComponent(
           node,
           CACHE_COMPONENTS.get(componentKey),
           !INITIAL_RENDER_COMPONENT
         );
         //recursion to fetch any inner components
         fetchComponents();
+        console.timeEnd(componentKey);
         continue;
       }
-
+      console.time(componentKey);
       try {
         let response = await fetch(componentKey);
         let component = await response.text();
@@ -71,9 +73,11 @@ async function fetchComponents() {
       } catch (err) {
         renderComponent(node, "Component not found", INITIAL_RENDER_COMPONENT);
       }
+      console.timeEnd(componentKey);
       return;
     }
   }
+
 }
 
 /**
@@ -84,25 +88,45 @@ async function fetchComponents() {
  */
 async function renderComponent(node, component, initialRender = true) {
   //render component to node
-
+  console.time('renderComponent');
   node.innerHTML = component;
   node.removeAttribute("html");
 
   let jsFile = node.getAttribute("js");
   // load js file
   if (jsFile != null && initialRender) {
-    let script = document.createElement("script");
-    script.setAttribute("src", jsFile);
-    script.setAttribute("type", "module");
-    document.head.appendChild(script);
+    // let script = document.createElement("script");
+    // script.setAttribute("src", jsFile);
+    // script.setAttribute("type", "module");
+    // document.head.appendChild(script);
     node.removeAttribute("js");
     let comp = await import("../components/home.js");
     comp.fetch();
     comp.render();
-    let user = new comp.Component();
-    let data = user.fetchData();
-    let compiledComponent = renderData(component, data);
-    node.innerHTML = compiledComponent;
+    let user = new comp.default();
+    try {
+      let data = user.fetchData();
+      console.time('template');
+      let compiledComponent = renderData(component, data);
+      console.timeEnd('template');
+      node.innerHTML = compiledComponent;
+    } catch (err) {
+      node.innerHTML = 'Hiouston we have an error ' + err;
+      console.log(err)
+    }
+  } else {
+    let comp = await import("../components/home.js");
+    let user = new comp.default();
+    try {
+      let data = user.fetchData();
+      console.time();
+      let compiledComponent = renderData(component, data);
+      console.timeEnd();
+      node.innerHTML = compiledComponent;
+    } catch (err) {
+      console.log(err)
+    }
+
   }
   let cssFile = node.getAttribute("css");
   // load css file
@@ -113,6 +137,7 @@ async function renderComponent(node, component, initialRender = true) {
     document.head.appendChild(css);
     node.removeAttribute("css");
   }
+  console.timeEnd('renderComponent');
 }
 
 function summitRouter(path, replaceId) {
@@ -126,3 +151,12 @@ const renderData = (template, data) => {
     return data[match.split(/{{|}}/).filter(Boolean)[0].split('.')[0]][match.split(/{{|}}/).filter(Boolean)[0].split('.')[1]];
   });
 };
+// Base Summit Component
+class SummitComponent {
+  render() {
+    console.log('not implemented')
+  }
+  fetchData() {
+    console.log('not implemented')
+  }
+}

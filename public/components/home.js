@@ -6,13 +6,15 @@ export function render() {
   console.log("in render");
 }
 
-export class Component {
-  constructor() {}
+export default class Component extends SummitComponent {
+  // constructor() {
+  //   super()
+  // }
   render() {
-    console.log("render user");
+    console.log("render");
   }
   fetchData() {
-    console.log("render user");
+    console.log("fetchData");
     return {
       name: "petros",
       user: {
