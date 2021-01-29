@@ -77,7 +77,6 @@ async function fetchComponents() {
       return;
     }
   }
-
 }
 
 /**
@@ -88,8 +87,8 @@ async function fetchComponents() {
  */
 async function renderComponent(node, component, initialRender = true) {
   //render component to node
-  console.time('renderComponent');
-  node.innerHTML = component;
+  console.time("renderComponent");
+  //node.innerHTML = component;
   node.removeAttribute("html");
 
   let jsFile = node.getAttribute("js");
@@ -101,32 +100,37 @@ async function renderComponent(node, component, initialRender = true) {
     // document.head.appendChild(script);
     node.removeAttribute("js");
     let comp = await import("../components/home.js");
-    comp.fetch();
-    comp.render();
     let user = new comp.default();
     try {
-      let data = user.fetchData();
-      console.time('template');
-      let compiledComponent = renderData(component, data);
-      console.timeEnd('template');
+      let compData = await user.fetchData();
+      console.log(compData);
+      let data = user.render(compData);
+      if (Array.isArray(data)) {
+        data = data.join(" ");
+      }
+      console.time("template");
+      let compiledComponent = renderData(component, { data: data });
+      console.timeEnd("template");
       node.innerHTML = compiledComponent;
     } catch (err) {
-      node.innerHTML = 'Hiouston we have an error ' + err;
-      console.log(err)
+      node.innerHTML = `<p>Hiouston we have an error</p><p>${err}</p>`;
+      console.log(err);
     }
   } else {
     let comp = await import("../components/home.js");
     let user = new comp.default();
     try {
-      let data = user.fetchData();
+      let data = user.render();
+      if (Array.isArray(data)) {
+        data = data.join(" ");
+      }
       console.time();
-      let compiledComponent = renderData(component, data);
+      let compiledComponent = renderData(component, { data: data });
       console.timeEnd();
       node.innerHTML = compiledComponent;
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-
   }
   let cssFile = node.getAttribute("css");
   // load css file
@@ -137,7 +141,7 @@ async function renderComponent(node, component, initialRender = true) {
     document.head.appendChild(css);
     node.removeAttribute("css");
   }
-  console.timeEnd('renderComponent');
+  console.timeEnd("renderComponent");
 }
 
 function summitRouter(path, replaceId) {
@@ -148,15 +152,15 @@ function summitRouter(path, replaceId) {
 
 const renderData = (template, data) => {
   return template.replace(/{{(.*?)}}/g, (match) => {
-    return data[match.split(/{{|}}/).filter(Boolean)[0].split('.')[0]][match.split(/{{|}}/).filter(Boolean)[0].split('.')[1]];
+    return data[match.split(/{{|}}/).filter(Boolean)[0].split(".")[0]];
   });
 };
 // Base Summit Component
 class SummitComponent {
   render() {
-    console.log('not implemented')
+    console.log("not implemented");
   }
   fetchData() {
-    console.log('not implemented')
+    console.log("not implemented");
   }
 }

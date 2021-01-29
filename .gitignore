@@ -1,3 +1,4 @@
 /node_modules
 .openode
 Dockerfile
+package-lock.json
